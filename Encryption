@@ -1,0 +1,34 @@
+from cryptography.fernet import Fernet
+import os  # Import the os module
+
+def generate_encryption_key():
+
+    
+  return Fernet.generate_key()
+
+def encrypt_file(key, file_path, output_path):
+  fernet = Fernet(key)
+  try:
+    with open(file_path, 'rb') as file:
+      # Read the original data
+      data = file.read()
+      encrypted_data = fernet.encrypt(data)
+    with open(output_path, 'wb') as encrypted_file:
+      encrypted_file.write(encrypted_data)  # Write encrypted data to new location
+      print(f"File encrypted and saved to: {output_path}")
+  except Exception as e:
+    print("Error:", e)
+
+
+file_path = input("Enter the path to the file you want to encrypt: ")
+
+
+output_path = os.path.join(os.path.dirname(file_path), os.path.basename(file_path))  # Add ".encrypted" extension
+
+# Encryption
+encrypt_file(key, file_path, output_path)
+
+# Save the key securely (don't print it)
+with open('encryption_key.txt', 'wb') as key_file:
+  key_file.write(key)
+  print("Encryption key saved to: encryption_key.txt")
