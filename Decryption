@@ -1,0 +1,51 @@
+from cryptography.fernet import Fernet, InvalidToken
+import os
+
+def load_key(key_file_path):
+  
+  try:
+    with open(key_file_path, 'rb') as key_file:
+      key = key_file.read()
+      return key
+  except FileNotFoundError:
+    print("Encryption key file not found. Please generate the key first using encryption code.")
+    exit(1)
+
+def decrypt_file(key, file_path, output_path):
+  
+  fernet = Fernet(key)
+  try:
+    with open(file_path, 'rb') as file:
+      # Read the encrypted data
+      data = file.read()
+      decrypted_data = fernet.decrypt(data)
+    if output_path:  # Check if output path is provided
+      with open(output_path, 'wb') as decrypted_file:
+        decrypted_file.write(decrypted_data)  # Write decrypted data to new location
+        print(f"File decrypted successfully and saved to: {output_path}")
+  except InvalidToken:
+    print("Decryption failed due to invalid token. Please ensure you have the correct key.")
+  except Exception as e:
+    print("Error during decryption:", e)
+
+# Load the key from the secure file (replace with your actual path)
+key_file_path = 'encryption_key.txt'  # Adjust path if needed
+
+# Check if key file exists
+if not os.path.exists(key_file_path):
+  print("Encryption key file not found. Please generate the key first using encryption code.")
+  exit(1)
+
+# Load the key
+encryption_key = load_key(key_file_path)
+
+# User input for file path
+file_path = input("Enter the path to the encrypted file you want to decrypt: ")
+
+# Create output path with "_decrypted" suffix and same extension
+output_path = os.path.splitext(file_path)[0] + os.path.splitext(file_path)[1]
+
+# Decryption with specifying output path
+decrypt_file(encryption_key, file_path, output_path)
+
+print(f"File decrypted successfully and saved to: {output_path}")
